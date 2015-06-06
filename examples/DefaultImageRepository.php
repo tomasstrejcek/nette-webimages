@@ -32,19 +32,28 @@ class DefaultImageProvider implements \DotBlue\WebImages\IRepository
 	public function getImage(\DotBlue\WebImages\ImageRequest $request)
 	{
 		$id = $request->getId();
-		$width = $request->getWidth();
-		$height = $request->getHeight();
+		$namespace = $request->getNamespace();
+		$type = $request->getType();
 		$parameters = $request->getParameters();
 
-		$algorithm = isset($parameters['algorithm'])
-			? $parameters['algorithm']
-			: self::FIT;
+		list($width, $height) = $this->config['image'][$namespace][$type]['size'];
+
+		switch ($this->config['image'][$namespace][$type]['resize']) {
+			case 'cut':
+				$resize = Image::EXACT;
+				break;
+			default:
+				$resize = null;
+		}
+		if (!$height) {
+			$resize = Image::FIT; //wrong resize type protection
+		}
 
 		$path = $this->pathFromId($id) . $id . '.jpg';
 
 		if (is_file($path)) {
 			$image = Image::fromFile($path);
-			$image->resize($width, $height, $algorithm);
+			$image->resize($width, $height, $resize);
 			return $image;
 		}
 		return null;

@@ -32,10 +32,4 @@ interface IRepository
 	 */
 	function saveImage($file);
 
-	/**
-	 * @param $id
-	 * @return string
-	 */
-	function pathFromId($id);
-
 }

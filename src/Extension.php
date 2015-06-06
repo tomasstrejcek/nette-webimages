@@ -79,6 +79,7 @@ class Extension extends DI\CompilerExtension
 					->setClass('DotBlue\WebImages\Route', [
 						$definition['mask'],
 						$definition['defaults'],
+						$this->config,
 						$this->prefix('@generator'),
 					])
 					->addTag($this->prefix('route'))
@@ -119,7 +120,6 @@ class Extension extends DI\CompilerExtension
 		}
 
 		foreach ($config['repositories'] as $name => $provider) {
-			dump($provider);
 			$this->compiler->parseServices($container, [
 				'services' => [$this->prefix('provider' . $name) => $provider],
 			]);

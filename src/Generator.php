@@ -19,8 +19,8 @@ class Generator extends Nette\Object
 	const FORMAT_PNG = Image::PNG;
 	const FORMAT_GIF = Image::GIF;
 
-	/** @var string */
-	private $wwwDir;
+	/** @var array */
+	private $config;
 
 	/** @var Http\IRequest */
 	private $httpRequest;
@@ -41,10 +41,9 @@ class Generator extends Nette\Object
 	 * @param Http\IResponse $httpResponse
 	 * @param Validator $validator
 	 */
-	public function __construct($wwwDir, Http\IRequest $httpRequest, Http\IResponse $httpResponse, Validator $validator)
+	public function __construct($config, Http\IRequest $httpRequest, Http\IResponse $httpResponse, Validator $validator)
 	{
-		dump(func_get_args());
-		$this->wwwDir = $wwwDir;
+		$this->config = $config;
 		$this->httpRequest = $httpRequest;
 		$this->httpResponse = $httpResponse;
 		$this->validator = $validator;
@@ -56,6 +55,7 @@ class Generator extends Nette\Object
 	 */
 	public function addRepository(IRepository $repository)
 	{
+		$repository->configure($this->config);
 		$this->repositories[] = $repository;
 	}
 
@@ -76,8 +76,9 @@ class Generator extends Nette\Object
 	 */
 	public function generateImage(ImageRequest $request)
 	{
-		$width = $request->getWidth();
-		$height = $request->getHeight();
+		$cfg =  $this->config['image'][$request->getNamespace()][$request->getType()];
+		list($width, $height) = $cfg['size'];
+		$quality = $cfg['quality'];
 		$format = $request->getFormat();
 
 		if (!$this->validator->validate($width, $height)) {
@@ -95,15 +96,17 @@ class Generator extends Nette\Object
 			}
 		}
 
-		if (!$image) {
+		/*if (!$image) {
 			$this->httpResponse->setHeader('Content-Type', 'image/jpeg');
 			$this->httpResponse->setCode(Http\IResponse::S404_NOT_FOUND);
 			exit;
-		}
+		}*/
 
-		$destination = $this->wwwDir . '/' . $this->httpRequest->getUrl()->getRelativeUrl();
+		$destination = $this->config['wwwDir'] . '/' . $this->httpRequest->getUrl()->getRelativeUrl();
 
 		$dirname = dirname($destination);
+		$this->httpResponse->setHeader('Content-Type', 'text/plain');
+
 		if (!is_dir($dirname)) {
 			$success = @mkdir($dirname, 0777, TRUE);
 			if (!$success) {
@@ -111,7 +114,7 @@ class Generator extends Nette\Object
 			}
 		}
 
-		$success = $image->save($destination, 90, $format);
+		$success = $image->save($destination, $quality, $format);
 		if (!$success) {
 			throw new Application\BadRequestException;
 		}

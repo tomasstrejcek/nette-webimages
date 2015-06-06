@@ -15,11 +15,11 @@ class ImageRequest extends Nette\Object
 	/** @var string */
 	private $id;
 
-	/** @var int|NULL */
-	private $width;
+	/** @var string|NULL */
+	private $namespace;
 
-	/** @var int|NULL */
-	private $height;
+	/** @var string|NULL */
+	private $type;
 
 	/** @var int */
 	private $format;
@@ -36,11 +36,11 @@ class ImageRequest extends Nette\Object
 	 * @param  int|NULL
 	 * @param  array
 	 */
-	public function __construct($format, $id, $width, $height, array $parameters)
+	public function __construct($format, $id, $namespace, $type, array $parameters)
 	{
 		$this->id = $id;
-		$this->width = $width;
-		$this->height = $height;
+		$this->namespace = $namespace;
+		$this->type = $type;
 		$this->format = $format;
 		$this->parameters = $parameters;
 	}
@@ -58,21 +58,21 @@ class ImageRequest extends Nette\Object
 
 
 	/**
-	 * @return int|NULL
+	 * @return string|NULL
 	 */
-	public function getWidth()
+	public function getNamespace()
 	{
-		return $this->width;
+		return $this->namespace;
 	}
 
 
 
 	/**
-	 * @return int|NULL
+	 * @return string|NULL
 	 */
-	public function getHeight()
+	public function getType()
 	{
-		return $this->height;
+		return $this->type;
 	}
 
 

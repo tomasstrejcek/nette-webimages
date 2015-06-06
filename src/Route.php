@@ -37,7 +37,7 @@ class Route extends Application\Routers\Route
 		self::FORMAT_GIF => Generator::FORMAT_GIF,
 	];
 
-	/** @var string */
+	/** @var array */
 	private $defaults;
 
 	/** @var Generator */
@@ -51,17 +51,17 @@ class Route extends Application\Routers\Route
 	 * @param  array
 	 * @param  Validator
 	 */
-	public function __construct($mask, array $defaults, Generator $generator)
+	public function __construct($mask, array $defaults, array $config, Generator $generator)
 	{
+
 		$this->defaults = $defaults;
 		$this->generator = $generator;
 
-		$defaults[NULL][self::FILTER_OUT] = function ($parameters) {
-			$width = $this->acquireArgument('width', $parameters);
-			$height = $this->acquireArgument('height', $parameters);
-
-			if (!$this->generator->getValidator()->validate($width, $height)) {
-				throw new NotAllowedImageException("Image with size {$width}x{$height} is not allowed - check your 'webimages.rules' please.");
+		$defaults[NULL][self::FILTER_OUT] = function ($parameters) use($config) {
+			$namespace = $this->acquireArgument('namespace', $parameters);
+			$type = $this->acquireArgument('type', $parameters);
+			if(!isset($config['image'][$namespace][$type])) {
+				throw new NotAllowedImageException("Image of namespace {$namespace} and type {$type} is not defined - check your 'webimages.image' please.");
 			}
 
 			if (isset($this->defaults[NULL][self::FILTER_OUT])) {
@@ -134,7 +134,11 @@ class Route extends Application\Routers\Route
 	}
 
 
-
+	/**
+	 * @param $name
+	 * @param array $data
+	 * @return mixed
+	 */
 	private function acquireArgument($name, array $data)
 	{
 		if (isset($data[$name])) {
@@ -145,7 +149,11 @@ class Route extends Application\Routers\Route
 	}
 
 
-
+	/**
+	 * @param $presenter
+	 * @throws Application\BadRequestException
+	 * @throws NotAllowedImageException
+	 */
 	public function __invoke($presenter)
 	{
 		$parameters = $presenter->getRequest()->getParameters();
@@ -174,8 +182,8 @@ class Route extends Application\Routers\Route
 		$this->generator->generateImage(new ImageRequest(
 			$format,
 			$id,
-			$this->acquireArgument('width', $parameters),
-			$this->acquireArgument('height', $parameters),
+			$this->acquireArgument('namespace', $parameters),
+			$this->acquireArgument('type', $parameters),
 			$parameters
 		));
 	}
