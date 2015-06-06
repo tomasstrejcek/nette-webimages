@@ -7,12 +7,7 @@ webimages:
 		- FakeImageProvider
 
 	routes:
-		- 'images/<id>-<width>x<height>.jpg'
-		- 'images/<id>-<width>x<height>.png'
-
-	rules:
-		- [width: 300, height: 200]
-		- [width: 50, height: 30]
+		- 'images/<prefix>/<namespace>-<type>-<id>.jpg'
 
 	image:
 		namespace:

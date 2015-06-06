@@ -1,3 +1,14 @@
+## About this fork
+
+Aim of this fork is to provide centralized point for managing image formats, sizes and cuts (algorithm of resize)
+
+#### Main differences
+
+IProvider => IRepository
++ method saveImage
+paths: images/<id>-<width>x<height>.jpg => images/<prefix>/<namespace>-<type>-<id>.jpg
+extension configuration is available trough all extension classes
+
 #### Requirements
 
 - PHP 5.4+
@@ -10,8 +21,20 @@
 ## Installation
 
 1) Copy source codes from Github or using [Composer](http://getcomposer.org/):
-```sh
-$ composer require dotblue/nette-webimages
+update composer.json
+```json
+"repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/tomasstrejcek/nette-webimages.git"
+        }
+    ],
+```
+
+```json
+"require": {
+	"dotblue/nette-webimages":"dev-master"
+}
 ```
 
 2) Register as Configurator's extension:
@@ -35,13 +58,13 @@ RewriteRule !\.(pdf|js|ico|gif|css|rar|zip|tar\.gz)$ index.php [L]
 
 ## Usage
 
-First, you have to define your `DotBlue\WebImages\IProvider` implementation. Its responsibility is to generate new version of image using `Nette\Image`. Check [examples](examples) for inspiration - the only required method `getImage` should return `Nette\Image` instance of queried image.
+First, you have to define your `DotBlue\WebImages\IRepository` implementation. Its responsibility is to save uploaded image or generate new version of image using `Nette\Image`. Check [examples](examples) for inspiration - the required method `getImage` should return `Nette\Image` instance of queried image and method saveImage which can process either Nette\Http\FileUpload or Nette\Utils\Image objects.
 
 When you have it, register it in configuration:
 
 ```
 webimages:
-	providers:
+	repositories:
 		- <name of your class>
 ```
 
@@ -50,21 +73,24 @@ Secondly you have to specify route where your images will be available. Central 
 ```
 webimages:
 	routes:
-		- images/<id>-<width>x<height>.jpg
+		- images/<prefix>/<namespace>-<type>-<id>.jpg
 ```
 
 > By default all these routes will be prepended before your other routes - assuming you use `Nette\Application\Routers\RouteList` as your root router. You can disable this by setting `prependRoutesToRouter: false`. Then it's your responsibility to plug webimages router (service `webimages.router`) to your routing implementation.
 
-Addon gives you new macro `n:src`. Now you're ready to use it.
+Addon gives you new macro `n:src` or `{src }`. Now you're ready to use it.
 
 ```html
-<img n:src="foo, 200, 150">
+<img n:src="foo, namespace, type">
 ```
-
+```smarty
+{src foo, namespace, type}
+```
 This will result in following HTML:
 
 ```html
-<img src="/images/foo-200x150.jpg">
+<img src="/images/prefix/namespace-type-id.jpg">
 ```
+note: prefix is substr(id, 0, 2)
 
-Creation of this file will handle your implementation of `DotBlue\WebImages\IProvider`.
+Creation of this file will handle your implementation of `DotBlue\WebImages\IRepository`.
