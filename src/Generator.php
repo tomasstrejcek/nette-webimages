@@ -96,11 +96,11 @@ class Generator extends Nette\Object
 			}
 		}
 
-		/*if (!$image) {
+		if (!$image) {
 			$this->httpResponse->setHeader('Content-Type', 'image/jpeg');
 			$this->httpResponse->setCode(Http\IResponse::S404_NOT_FOUND);
 			exit;
-		}*/
+		}
 
 		$destination = $this->config['wwwDir'] . '/' . $this->httpRequest->getUrl()->getRelativeUrl();
 
