@@ -4,10 +4,10 @@ Aim of this fork is to provide centralized point for managing image formats, siz
 
 #### Main differences
 
-IProvider => IRepository
-+ method saveImage
-paths: images/<id>-<width>x<height>.jpg => images/<prefix>/<namespace>-<type>-<id>.jpg
-extension configuration is available trough all extension classes
++ IProvider => IRepository
++ +method saveImage
++ paths: images/<id>-<width>x<height>.jpg => images/<prefix>/<namespace>-<type>-<id>.jpg
++ extension configuration is available trough all extension classes
 
 #### Requirements
 
