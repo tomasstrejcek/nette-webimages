@@ -17,9 +17,10 @@ class Extension extends DI\CompilerExtension
 		'routes' => [],
 		'prependRoutesToRouter' => TRUE,
 		'rules' => [],
-		'providers' => [],
+		'repositories' => [],
 		'wwwDir' => '%wwwDir%',
 		'format' => Route::FORMAT_JPEG,
+		'quality' => 100
 	];
 
 
@@ -34,7 +35,7 @@ class Extension extends DI\CompilerExtension
 
 		$generator = $container->addDefinition($this->prefix('generator'))
 			->setClass('DotBlue\WebImages\Generator', [
-				$config['wwwDir'],
+				$config,
 			]);
 
 		foreach ($config['rules'] as $rule) {
@@ -113,15 +114,16 @@ class Extension extends DI\CompilerExtension
 			}
 		}
 
-		if (count($config['providers']) === 0) {
-			throw new InvalidConfigException("You have to register at least one IProvider in '" . $this->prefix('providers') . "' directive.");
+		if (count($config['repositories']) === 0) {
+			throw new InvalidConfigException("You have to register at least one IRepository in '" . $this->prefix('repositories') . "' directive.");
 		}
 
-		foreach ($config['providers'] as $name => $provider) {
+		foreach ($config['repositories'] as $name => $provider) {
+			dump($provider);
 			$this->compiler->parseServices($container, [
 				'services' => [$this->prefix('provider' . $name) => $provider],
 			]);
-			$generator->addSetup('addProvider', [$this->prefix('@provider' . $name)]);
+			$generator->addSetup('addRepository', [$this->prefix('@provider' . $name)]);
 		}
 
 		$latte = $container->getDefinition('nette.latteFactory');

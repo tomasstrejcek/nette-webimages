@@ -13,3 +13,10 @@ webimages:
 	rules:
 		- [width: 300, height: 200]
 		- [width: 50, height: 30]
+
+	image:
+		namespace:
+			type:
+				size: [1200, null]
+				quality: 80
+				resize: default

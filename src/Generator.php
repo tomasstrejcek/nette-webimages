@@ -31,13 +31,19 @@ class Generator extends Nette\Object
 	/** @var Validator */
 	private $validator;
 
-	/** @var IProvider[] */
-	private $providers = [];
+	/** @var IRepository[] */
+	private $repositories = [];
 
 
-
+	/**
+	 * @param $wwwDir
+	 * @param Http\IRequest $httpRequest
+	 * @param Http\IResponse $httpResponse
+	 * @param Validator $validator
+	 */
 	public function __construct($wwwDir, Http\IRequest $httpRequest, Http\IResponse $httpResponse, Validator $validator)
 	{
+		dump(func_get_args());
 		$this->wwwDir = $wwwDir;
 		$this->httpRequest = $httpRequest;
 		$this->httpResponse = $httpResponse;
@@ -45,10 +51,12 @@ class Generator extends Nette\Object
 	}
 
 
-
-	public function addProvider(IProvider $provider)
+	/**
+	 * @param IRepository $provider
+	 */
+	public function addRepository(IRepository $repository)
 	{
-		$this->providers[] = $provider;
+		$this->repositories[] = $repository;
 	}
 
 
@@ -62,7 +70,10 @@ class Generator extends Nette\Object
 	}
 
 
-
+	/**
+	 * @param ImageRequest $request
+	 * @throws Application\BadRequestException
+	 */
 	public function generateImage(ImageRequest $request)
 	{
 		$width = $request->getWidth();
@@ -74,7 +85,10 @@ class Generator extends Nette\Object
 		}
 
 		$image = NULL;
-		foreach ($this->providers as $provider) {
+
+		/** @var IRepository $provider */
+		foreach ($this->repositories as $provider) {
+			/** @var Image $image */
 			$image = $provider->getImage($request);
 			if ($image) {
 				break;
