@@ -1,5 +1,5 @@
 {
-    "name": "dotblue/nette-webimages",
+    "name": "tomasstrejcek/nette-webimages",
     "description": "On-the-fly generated web images for your Nette app",
     "type": "library",
     "keywords": [
