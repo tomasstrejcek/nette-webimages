@@ -38,7 +38,15 @@ class Macros extends Latte\Macros\MacroSet
 	{
 		$absolute = substr($node->args, 0, 2) === '//' ? '//' : '';
 		$args = $absolute ? substr($node->args, 2) : $node->args;
-		return $writer->write('echo %escape(%modify($_presenter->link("' . $absolute . ':Nette:Micro:", DotBlue\WebImages\Macros::prepareArguments([' . $args . ']))))');
+		return $writer->write('echo %escape(%modify(DotBlue\WebImages\Macros::validate([' . $args . '], $_presenter->link("' . $absolute . ':Nette:Micro:", DotBlue\WebImages\Macros::prepareArguments([' . $args . '])))))');
+	}
+
+	public static function validate($args, $link)
+	{
+		if (array_key_exists(0, $args) && $args[0] === null) {
+			return '#';
+		}
+		return $link;
 	}
 
 	/**
